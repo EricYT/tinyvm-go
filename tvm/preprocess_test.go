@@ -44,29 +44,69 @@ func TestPrepreocessNotInclude(t *testing.T) {
 
 func TestPreprocessDefines(t *testing.T) {
 	src, _ := ReadFile("./preprocessor/define.vm", ".vm")
-	newSrc, defines, defined, err := processDefines(src)
+	newSrc, define, err := processDefines(src)
 	if err != nil {
 		t.Fatalf("TestPreprocessDefines process defines error: %s", err)
 	}
-	if defines == nil || !defined {
+	if define == nil {
 		t.Fatalf("TestPreprocessDefines not find defines")
 	}
-	if defines.key != "ONE" || defines.value != "1" {
-		t.Fatalf("TestPreprocessDefines process define key '%%define' ONE 1 but got key/value %s %s", defines.key, defines.value)
+	if define.key != "ONE" || string(define.value) != "1" {
+		t.Fatalf("TestPreprocessDefines process define key '%%define ONE 1' but got key/value (%s) (%s)", define.key, string(define.value))
 	}
 	indexFirstLine := bytes.IndexByte(src, '\n')
 	if !bytes.Equal(newSrc, src[indexFirstLine+1:]) {
-		t.Fatalf("TestPrepreocessNotInclude process defines not remove it from orignal source file")
+		t.Fatalf("TestPreprocessDefines process defines not remove it from orignal source file")
 	}
+
+	// mutiple spaces between key and value
+	src = []byte("   foo %define   foo    bar   \n")
+	_, define, err = processDefines(src)
+	if err != nil {
+		t.Fatalf("TestPreprocessDefines process mutiple spaces between key and value data error: %s", err)
+	}
+	if define == nil {
+		t.Fatalf("TestPreprocessDefines process not parse define.")
+	}
+	if define.key != "foo" || string(define.value) != "bar" {
+		t.Fatalf("TestPreprocessDefines process define key '%%define   foo    bar' but got key/value (%s) (%s)", define.key, string(define.value))
+	}
+
 }
 
 func TestPreprocessNoDefines(t *testing.T) {
 	src, _ := ReadFile("./preprocessor/print_eax.vm", ".vm")
-	_, _, defined, err := processDefines(src)
+	_, define, err := processDefines(src)
 	if err != nil {
 		t.Fatalf("TestPreprocessNoDefines process no define error: %s", err)
 	}
-	if defined {
+	if define != nil {
 		t.Fatalf("TestPreprocessNoDefines there is no defines in the file.")
+	}
+}
+
+func TestPreprocessDefinesWrong(t *testing.T) {
+	src := "   %define\nbalabala"
+	_, _, err := processDefines([]byte(src))
+	if err != ErrorPreprocessDefineMissArgs {
+		t.Fatalf("TestPreprocessDefinesWrong the define arguments is missing.")
+	}
+
+	src = "   %define \nbalabala"
+	_, _, err = processDefines([]byte(src))
+	if err != ErrorPreprocessDefineWrongArgs {
+		t.Fatalf("TestPreprocessDefinesWrong the define arguments is missing key and value.")
+	}
+
+	src = "   %define x\nbalabala"
+	_, _, err = processDefines([]byte(src))
+	if err != ErrorPreprocessDefineWrongArgs {
+		t.Fatalf("TestPreprocessDefinesWrong the define arguments is missing value.")
+	}
+
+	src = "foo\n%define x y z\nbalabala"
+	_, _, err = processDefines([]byte(src))
+	if err != ErrorPreprocessDefineWrongArgs {
+		t.Fatalf("TestPreprocessDefinesWrong the define arguments is more than two key/value.")
 	}
 }
