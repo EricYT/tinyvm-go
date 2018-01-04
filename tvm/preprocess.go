@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"log"
+	"unicode"
 )
 
 var (
@@ -12,7 +13,7 @@ var (
 	ErrorPreprocessDefineMultipleDefine error = errors.New("preprocess: multiple define")
 )
 
-func (c *Ctx) preprocess(source []byte) error {
+func (c *Ctx) preprocess(source []byte) ([]byte, error) {
 	var included bool
 	var def *define
 	var err error
@@ -20,16 +21,16 @@ func (c *Ctx) preprocess(source []byte) error {
 	for {
 		source, included, err = processIncludes(source)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		source, def, err = processDefines(source)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		if def != nil {
-			if _, err = c.prog.defines.FindRef(def.key); err != nil {
+			if _, ok := c.prog.defines.FindRef(def.key); ok {
 				log.Printf("Multiple definitions for %s.\n", def.key)
-				return ErrorPreprocessDefineMultipleDefine
+				return nil, ErrorPreprocessDefineMultipleDefine
 			}
 			c.prog.defines.AddRef(def.key, def.value)
 		}
@@ -38,7 +39,7 @@ func (c *Ctx) preprocess(source []byte) error {
 		}
 	}
 
-	return nil
+	return source, nil
 }
 
 func processIncludes(source []byte) ([]byte, bool, error) {
@@ -102,20 +103,14 @@ func processDefines(source []byte) ([]byte, *define, error) {
 		return source, nil, ErrorPreprocessDefineMissArgs
 	}
 
-	defineData := bytes.TrimSpace(source[begin+offset : end])
-	var kv [][]byte
-	tmp := bytes.Split(defineData, []byte(" "))
-	for _, v := range tmp {
-		// filter the space between key and value
-		if len(v) > 0 {
-			kv = append(kv, v)
-		}
-	}
+	kv := bytes.FieldsFunc(source[begin+offset:end], func(c rune) bool {
+		return unicode.IsSpace(c)
+	})
 	if len(kv) != 2 {
 		return source, nil, ErrorPreprocessDefineWrongArgs
 	}
-	key := string(bytes.TrimSpace(kv[0]))
-	value := bytes.TrimSpace(kv[1])
+	key := string(kv[0])
+	value := kv[1]
 
 	// remove the line from source
 	var remain []byte

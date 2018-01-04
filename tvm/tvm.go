@@ -31,9 +31,11 @@ func (c *Ctx) Interpret(filename string) error {
 	}
 
 	// preprocess source
-	if err = c.preprocess(source); err != nil {
+	if source, err = c.preprocess(source); err != nil {
 		return err
 	}
+
+	// lexer analysis
 
 	return nil
 }

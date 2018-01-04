@@ -32,11 +32,11 @@ func (h *htabCtx) Add(key string, value int) error {
 	return nil
 }
 
-func (h *htabCtx) Find(key string) (int, error) {
+func (h *htabCtx) Find(key string) (int, bool) {
 	if node, ok := h.nodes[key]; ok {
-		return node.value, nil
+		return node.value, true
 	}
-	return -1, ErrorHtabCtxKeyNotFound
+	return -1, false
 }
 
 func (h *htabCtx) AddRef(key string, value []byte) error {
@@ -47,11 +47,11 @@ func (h *htabCtx) AddRef(key string, value []byte) error {
 	return nil
 }
 
-func (h *htabCtx) FindRef(key string) ([]byte, error) {
+func (h *htabCtx) FindRef(key string) ([]byte, bool) {
 	if node, ok := h.nodes[key]; ok {
-		return node.valueRaw, nil
+		return node.valueRaw, true
 	}
-	return nil, ErrorHtabCtxKeyNotFound
+	return nil, false
 }
 
 type htabNode struct {

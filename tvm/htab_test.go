@@ -22,12 +22,12 @@ func TestHtabCtxFind(t *testing.T) {
 
 	htab.Add("foo", 1)
 
-	if value, err := htab.Find("foo"); err != nil || value != 1 {
-		t.Fatalf("htabCtx: find foo error %s value should be 1 but %d", err, value)
+	if value, ok := htab.Find("foo"); !ok || value != 1 {
+		t.Fatalf("htabCtx: foo not found or value should equal 1 but %d", value)
 	}
 
-	if _, err := htab.Find("bar"); err == nil {
-		t.Fatalf("htabNode: find a not found key bar should error")
+	if _, ok := htab.Find("bar"); ok {
+		t.Fatalf("htabNode: bar isn't in the htab but we got it")
 	}
 }
 
@@ -54,11 +54,11 @@ func TestHtabCtxFindRef(t *testing.T) {
 
 	htab.AddRef(k, v)
 
-	if value, err := htab.FindRef(k); err != nil || !bytes.Equal(value, v) {
-		t.Fatalf("htabCtx: find foo error %s value should be %v but %v", err, v, value)
+	if value, ok := htab.FindRef(k); !ok || !bytes.Equal(value, v) {
+		t.Fatalf("htabCtx: foo not found or value should be %v but %v", v, value)
 	}
 
-	if _, err := htab.FindRef("bar"); err == nil {
-		t.Fatalf("htabNode: find a not found key bar should error")
+	if _, ok := htab.FindRef("bar"); ok {
+		t.Fatalf("htabNode: the ref of bar isn't in the htab but we got it")
 	}
 }
