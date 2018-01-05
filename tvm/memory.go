@@ -18,7 +18,7 @@ type Mem struct {
 	FLAGS     int
 	remainder int
 
-	space     []byte
+	space     []int
 	spaceSize int
 
 	registers [17]regUnit
@@ -28,7 +28,7 @@ func NewMem(size int) *Mem {
 	m := new(Mem)
 
 	m.spaceSize = size
-	m.space = make([]byte, size)
+	m.space = make([]int, size)
 
 	return m
 }

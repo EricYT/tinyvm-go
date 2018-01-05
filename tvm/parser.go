@@ -3,6 +3,7 @@ package tvm
 import (
 	"bytes"
 	"errors"
+	"strconv"
 )
 
 var (
@@ -72,7 +73,26 @@ func (ctx *Ctx) parseArgs(instrTokens [][]byte, index int) []*int {
 		/* Check to see if the token specifies a register */
 		if reg := tokenToRegister(token, ctx.mem); reg != nil {
 			args[i] = reg
+			continue
 		}
+
+		/* Check to see wheather the token specifies an address */
+		if token[0] == '[' {
+			endIdx := bytes.IndexByte(token, ']')
+			if endIdx != -1 {
+				args[i] = &ctx.mem.space[parseValue(token[1:endIdx])]
+				continue
+			}
+		}
+
+		/* Check if the argument is a label */
+		if addr, ok := ctx.prog.labels.Find(string(token)); ok {
+			args[i] = addValue(*addr, ctx.prog)
+			continue
+		}
+
+		/* Fuck it, parse it as a value */
+		args[i] = addValue(parseValue(token), ctx.prog)
 	}
 
 	return args
@@ -98,6 +118,31 @@ func (ctx *Ctx) parseInstr(instrTokens [][]byte) (opcode, int) {
 }
 
 // utils
+func parseValue(token []byte) int {
+	delimiter := bytes.IndexByte(token, '|')
+	var base int = 0
+
+	if delimiter != -1 {
+		identifier := delimiter + 1
+
+		switch token[identifier] {
+		case 'h':
+			base = 16
+		case 'b':
+			base = 2
+		default:
+			base = 0
+		}
+	}
+
+	val, err := strconv.ParseInt(string(token[:delimiter]), base, 64)
+	if err != nil {
+		panic(err)
+	}
+
+	return int(val)
+}
+
 func instrToOpCode(instr []byte) (opcode, bool) {
 	if opc, ok := opcodeMap[string(instr)]; ok {
 		return opc, true
@@ -110,4 +155,9 @@ func tokenToRegister(token []byte, mem *Mem) *int {
 		return &mem.registers[reg].i32
 	}
 	return nil
+}
+
+func addValue(val int, prog *Prog) *int {
+	prog.values = append(prog.values, val)
+	return &prog.values[len(prog.values)-1]
 }
