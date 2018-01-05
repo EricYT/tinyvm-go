@@ -57,6 +57,11 @@ func (ctx *Ctx) ParseLabels(lexer *lexerCtx) error {
 	return nil
 }
 
+func (ctx *Ctx) ParseProgram(lexer *lexerCtx) error {
+
+	return nil
+}
+
 /* This function takes the instruction tokens, and location of the
  * instruction inside the line, parses the arguments, and returns a
  * pointer to the heap where they're stored.
@@ -72,7 +77,7 @@ func (ctx *Ctx) parseArgs(instrTokens [][]byte, index int) []*int {
 		token := instrTokens[argIdx]
 		/* Check to see if the token specifies a register */
 		if reg := tokenToRegister(token, ctx.mem); reg != nil {
-			args[i] = reg
+			args = append(args, reg)
 			continue
 		}
 
@@ -80,21 +85,20 @@ func (ctx *Ctx) parseArgs(instrTokens [][]byte, index int) []*int {
 		if token[0] == '[' {
 			endIdx := bytes.IndexByte(token, ']')
 			if endIdx != -1 {
-				args[i] = &ctx.mem.space[parseValue(token[1:endIdx])]
+				args = append(args, &ctx.mem.space[parseValue(token[1:endIdx])])
 				continue
 			}
 		}
 
 		/* Check if the argument is a label */
 		if addr, ok := ctx.prog.labels.Find(string(token)); ok {
-			args[i] = addValue(*addr, ctx.prog)
+			args = append(args, addValue(*addr, ctx.prog))
 			continue
 		}
 
 		/* Fuck it, parse it as a value */
-		args[i] = addValue(parseValue(token), ctx.prog)
+		args = append(args, addValue(parseValue(token), ctx.prog))
 	}
-
 	return args
 }
 
