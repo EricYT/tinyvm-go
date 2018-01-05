@@ -22,7 +22,7 @@ func TestHtabCtxFind(t *testing.T) {
 
 	htab.Add("foo", 1)
 
-	if value, ok := htab.Find("foo"); !ok || value != 1 {
+	if value, ok := htab.Find("foo"); !ok || *value != 1 {
 		t.Fatalf("htabCtx: foo not found or value should equal 1 but %d", value)
 	}
 

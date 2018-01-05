@@ -24,7 +24,7 @@ func NewCtx() *Ctx {
 func (c *Ctx) Interpret(filename string) error {
 	log.Printf("Prepare to interpret the file %s", filename)
 
-	// Attempt to read the file all
+	// Attempt to read the source file
 	source, err := ReadFile(filename, ".vm")
 	if err != nil {
 		return err
@@ -36,6 +36,12 @@ func (c *Ctx) Interpret(filename string) error {
 	}
 
 	// lexer analysis
+	lexer := NewLexerCtx()
+	lexer.Parse(source, c.prog.defines)
+
+	// parse labels
+
+	// parse program
 
 	return nil
 }

@@ -32,11 +32,11 @@ func (h *htabCtx) Add(key string, value int) error {
 	return nil
 }
 
-func (h *htabCtx) Find(key string) (int, bool) {
+func (h *htabCtx) Find(key string) (*int, bool) {
 	if node, ok := h.nodes[key]; ok {
-		return node.value, true
+		return &node.value, true
 	}
-	return -1, false
+	return nil, false
 }
 
 func (h *htabCtx) AddRef(key string, value []byte) error {

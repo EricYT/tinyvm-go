@@ -7,6 +7,10 @@ import (
 
 // lexer implement
 
+const (
+	MAX_ARGS int = 2
+)
+
 type Token []byte
 type Line []byte
 
@@ -29,9 +33,14 @@ func (lexer *lexerCtx) Parse(src []byte, defines *htabCtx) {
 	// split all lines into tokens
 	for _, line := range lexer.sourceLines {
 		// filter comments delimited by '#'
-		if isComment(line) || isSpaceLine(line) {
+		commentIdx := bytes.IndexByte(line, '#')
+		if commentIdx != -1 {
+			line = line[:commentIdx]
+		}
+		if isSpaceLine(line) {
 			continue
 		}
+
 		// split lines
 		toks := bytes.FieldsFunc(line, func(c rune) bool {
 			// ' ' || '\t' || ','

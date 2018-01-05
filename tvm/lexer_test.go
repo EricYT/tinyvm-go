@@ -63,8 +63,8 @@ func TestIsSpaceLine(t *testing.T) {
 var src string = `
 	# I'm a comment.
 start:
-  mov eax, 42
-	mov ebx, ONE
+  mov eax, 42       # I'm a comment too
+	mov ebx, ONE      #So am I
 	call print_eax
 
 	mov		eax,					23
