@@ -6,8 +6,8 @@ type Prog struct {
 	start int
 
 	numInstr int
-	instr    []int
-	args     [][]int
+	instr    []opcode
+	args     [][]*int
 
 	values    []int
 	numValues int

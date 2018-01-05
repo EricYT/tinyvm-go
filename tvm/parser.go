@@ -12,6 +12,26 @@ var (
 	ErrorProgParseInstrNotExists error = errors.New("parser: no instruction exists")
 )
 
+func (ctx *Ctx) ParseProgram(lexer *lexerCtx) error {
+
+	for _, lineTokens := range lexer.Tokens() {
+		opc, instrIdx := ctx.parseInstr(lineTokens)
+		if opc == opcode(-1) {
+			continue
+		}
+		args := ctx.parseArgs(lineTokens, instrIdx)
+		if len(args) == 0 {
+			// No arguments
+			continue
+		}
+
+		ctx.prog.instr = append(ctx.prog.instr, opc)
+		ctx.prog.args = append(ctx.prog.args, args)
+	}
+
+	return nil
+}
+
 func (ctx *Ctx) ParseLabels(lexer *lexerCtx) error {
 	var numInstr int
 	prog := ctx.prog
@@ -53,11 +73,6 @@ func (ctx *Ctx) ParseLabels(lexer *lexerCtx) error {
 			numInstr++
 		}
 	}
-
-	return nil
-}
-
-func (ctx *Ctx) ParseProgram(lexer *lexerCtx) error {
 
 	return nil
 }
