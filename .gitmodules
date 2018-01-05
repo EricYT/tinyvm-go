@@ -1,0 +1,3 @@
+[submodule "tinyvm"]
+  path = tinyvm
+  url = https://github.com/jakogut/tinyvm
