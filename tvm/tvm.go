@@ -40,8 +40,14 @@ func (c *Ctx) Interpret(filename string) error {
 	lexer.Parse(source, c.prog.defines)
 
 	// parse labels
+	if err := c.ParseLabels(lexer); err != nil {
+		return err
+	}
 
 	// parse program
+	if err := c.ParseProgram(lexer); err != nil {
+		return err
+	}
 
 	return nil
 }
