@@ -1,27 +1,9 @@
-# Go app template build environment
-[![Build Status](https://travis-ci.org/thockin/go-build-template.svg?branch=master)](https://travis-ci.org/thockin/go-build-template) 
+# tinyvm-go
 
-This is a skeleton project for a Go application, which captures the best build
-techniques I have learned to date.  It uses a Makefile to drive the build (the
-universal API to software projects) and a Dockerfile to build a docker image.
+TinyVM-go is a go implement version that inspired by the project [![tinyvm](https://github.com/jakogut/tinyvm)](https://github.com/jakogut/tinyvm)
 
-This has only been tested on Linux, and depends on Docker to build.
-
-## Customizing it
-
-To use this, simply copy these files and make the following changes:
-
-Makefile:
-   - change `BIN` to your binary name
-   - rename `cmd/myapp` to `cmd/$BIN`
-   - change `PKG` to the Go import path of this repo
-   - change `REGISTRY` to the Docker registry you want to use
-   - maybe change `SRC_DIRS` if you use some other layout
-   - choose a strategy for `VERSION` values - git tags or manual
-
-Dockerfile.in:
-   - change the `MAINTAINER` to you
-   - maybe change or remove the `USER` if you need
+TinyVM is a virtual machine with the goal of having a small footprint.
+Translating the source code into bytecodes that we can operate.
 
 ## Building
 
