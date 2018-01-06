@@ -16,14 +16,16 @@ limitations under the License.
 
 package main
 
-import "log"
+import (
+	"os"
 
-var logPrefix string = "[tvm] "
-
-func init() {
-	log.SetPrefix(logPrefix)
-}
+	"github.com/EricYT/tinyvm-go/tvm"
+)
 
 func main() {
-	log.Printf("tinyvm-go")
+	tvmCtx := tvm.NewCtx()
+	if err := tvmCtx.Interpret(os.Args[1]); err != nil {
+		panic(err)
+	}
+	tvmCtx.Run()
 }

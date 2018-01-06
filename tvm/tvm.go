@@ -77,6 +77,7 @@ func (ctx *Ctx) step(instrIdx *int) error {
 	opcode := ctx.prog.instr[*instrIdx]
 	args := ctx.prog.args[*instrIdx]
 
+	fmt.Printf("instrIdx: %d opcode: %d\n", *instrIdx, opcode)
 	switch opcode {
 	case NOP: // nop
 	case INT: // int  TODO: not implement
@@ -126,9 +127,15 @@ func (ctx *Ctx) step(instrIdx *int) error {
 		*args[0] >>= uint(*args[1])
 
 	case CMP: // cmp
-		if (*args[0] == *args[1]) || (*args[0] > *args[1]<<1) {
-			ctx.mem.FLAGS = 0x1
+		var r1 int
+		if *args[0] == *args[1] {
+			r1 = 0x1
 		}
+		var r2 int
+		if *args[0] > *args[1] {
+			r2 = 0x1
+		}
+		ctx.mem.FLAGS = r1 | (r2 << 1)
 	case CALL: // call
 		ctx.mem.StackPush(instrIdx)
 		fallthrough
@@ -150,15 +157,15 @@ func (ctx *Ctx) step(instrIdx *int) error {
 			*instrIdx = *args[0] - 1
 		}
 	case JGE: // jge
-		if (ctx.mem.FLAGS & 0x3) == 0x3 {
+		if (ctx.mem.FLAGS & 0x3) != 0x0 {
 			*instrIdx = *args[0] - 1
 		}
 	case JL: // jl
-		if (ctx.mem.FLAGS & 0x3) != 0x3 {
+		if (ctx.mem.FLAGS & 0x3) == 0x0 {
 			*instrIdx = *args[0] - 1
 		}
 	case JLE: // jle
-		if (ctx.mem.FLAGS & 0x2) != 0x2 {
+		if (ctx.mem.FLAGS & 0x2) == 0x0 {
 			*instrIdx = *args[0] - 1
 		}
 	case PRN: // prn

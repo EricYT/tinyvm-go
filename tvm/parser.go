@@ -125,7 +125,8 @@ func (ctx *Ctx) parseInstr(instrTokens [][]byte) (opcode, int) {
 		if len(token) == 0 {
 			continue
 		}
-		if opc, ok := instrToOpCode(token); ok {
+		opc, ok := instrToOpCode(token)
+		if ok {
 			ctx.prog.numInstr++
 			return opc, index
 		}
