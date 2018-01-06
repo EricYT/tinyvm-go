@@ -4,6 +4,8 @@ package tvm
 
 const (
 	NUM_REGISTERS int = 17
+
+	MIN_MEMORY_SIZE int = 64 * 1024 * 1024 /* 64 MB */
 )
 
 type Mem struct {
@@ -36,6 +38,24 @@ func NewMem(size int) *Mem {
 type regUnit struct {
 	//i32 int32
 	//val []int32
-	i32 int
-	val []int
+	i32    int
+	i32Ptr *int
+}
+
+/* Initialize our stack by setting the base pointer and stack pointer */
+func (m *Mem) StackCreate(size int) {
+	// point to the bottom of stack
+	m.registers[0x7].i32 = len(m.space)
+	m.registers[0x6].i32 = m.registers[0x7].i32
+}
+
+func (m *Mem) StackPush(item *int) {
+	m.registers[0x6].i32 -= 1
+	m.space[m.registers[0x6].i32] = *item
+}
+
+func (m *Mem) StackPop() *int {
+	dest := m.space[m.registers[0x6].i32]
+	m.registers[0x6].i32 += 1
+	return &dest
 }

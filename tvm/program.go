@@ -15,3 +15,12 @@ type Prog struct {
 	defines *htabCtx
 	labels  *htabCtx
 }
+
+func NewProg() *Prog {
+	prog := new(Prog)
+
+	prog.defines = NewHtabCtx()
+	prog.labels = NewHtabCtx()
+
+	return prog
+}

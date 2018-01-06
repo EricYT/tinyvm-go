@@ -19,13 +19,8 @@ func (ctx *Ctx) ParseProgram(lexer *lexerCtx) error {
 		if opc == opcode(-1) {
 			continue
 		}
-		args := ctx.parseArgs(lineTokens, instrIdx)
-		if len(args) == 0 {
-			// No arguments
-			continue
-		}
-
 		ctx.prog.instr = append(ctx.prog.instr, opc)
+		args := ctx.parseArgs(lineTokens, instrIdx)
 		ctx.prog.args = append(ctx.prog.args, args)
 	}
 
@@ -35,7 +30,6 @@ func (ctx *Ctx) ParseProgram(lexer *lexerCtx) error {
 func (ctx *Ctx) ParseLabels(lexer *lexerCtx) error {
 	var numInstr int
 	prog := ctx.prog
-
 	for _, tokens := range lexer.Tokens() {
 		// tokens of every signal line
 		validInstruction := false
@@ -55,7 +49,7 @@ func (ctx *Ctx) ParseLabels(lexer *lexerCtx) error {
 				continue
 			}
 			// trim the last char ':'
-			token = bytes.TrimLeft(token, ":")
+			token = token[:len(token)-1]
 
 			/* If the label is "start", make it the entry point */
 			if "start" == string(token) {
@@ -85,11 +79,15 @@ func (ctx *Ctx) parseArgs(instrTokens [][]byte, index int) []*int {
 	var args []*int
 	for i := 0; i < MAX_ARGS; i++ {
 		argIdx := index + 1 + i
-		if argIdx > len(instrTokens) || len(instrTokens[argIdx]) == 0 {
+		if argIdx >= len(instrTokens) {
 			continue
 		}
 
 		token := instrTokens[argIdx]
+		if len(token) == 0 {
+			continue
+		}
+
 		/* Check to see if the token specifies a register */
 		if reg := tokenToRegister(token, ctx.mem); reg != nil {
 			args = append(args, reg)
@@ -152,9 +150,10 @@ func parseValue(token []byte) int {
 		default:
 			base = 0
 		}
+		token = token[:delimiter]
 	}
 
-	val, err := strconv.ParseInt(string(token[:delimiter]), base, 64)
+	val, err := strconv.ParseInt(string(token), base, 64)
 	if err != nil {
 		panic(err)
 	}
