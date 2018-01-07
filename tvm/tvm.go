@@ -77,7 +77,6 @@ func (ctx *Ctx) step(instrIdx *int) error {
 	opcode := ctx.prog.instr[*instrIdx]
 	args := ctx.prog.args[*instrIdx]
 
-	fmt.Printf("instrIdx: %d opcode: %d\n", *instrIdx, opcode)
 	switch opcode {
 	case NOP: // nop
 	case INT: // int  TODO: not implement
