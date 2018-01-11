@@ -64,11 +64,31 @@ start:
         call print_eax
 $ ./bin/amd64/tdb programs/tinyvm/jsr.vm
 2018/01/11 21:32:10 Prepare to interpret the file programs/tinyvm/jsr.vm
-tdb >: b 1
-WARNING: "b" is not a valid command.
+tdb >: bs 1
+WARNING: "bs" is not a valid command.
 tdb >: break 1
 tdb >: run
 BreakPoint hit at address: 1
+tdb >: infos
+register infos:
+register eax value: i32: 42 i32Ptr is nil
+register ebx value: i32: 0 i32Ptr is nil
+register ecx value: i32: 0 i32Ptr is nil
+register edx value: i32: 0 i32Ptr is nil
+register esi value: i32: 0 i32Ptr is nil
+register edi value: i32: 0 i32Ptr is nil
+register esp value: i32: 67108862 i32Ptr is nil
+register ebp value: i32: 67108864 i32Ptr is nil
+register eip value: i32: 1 i32Ptr is nil
+register r08 value: i32: 0 i32Ptr is nil
+register r09 value: i32: 0 i32Ptr is nil
+register r10 value: i32: 0 i32Ptr is nil
+register r11 value: i32: 0 i32Ptr is nil
+register r12 value: i32: 0 i32Ptr is nil
+register r13 value: i32: 0 i32Ptr is nil
+register r14 value: i32: 0 i32Ptr is nil
+register r15 value: i32: 0 i32Ptr is nil
+FLAGS: 0 Remainder: 0
 tdb >: step
 Advancing instruction pointer to 2
 tdb >: step
@@ -84,4 +104,4 @@ End of program readched.
 ```
 
 ## TODO
-- debug print information of registers
+- tdb print file source code
