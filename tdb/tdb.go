@@ -18,7 +18,7 @@ func Shell(tvm *tinyvm.Ctx) error {
 	var breakpoints []BreakPoint
 
 	// initialize start register
-	tvm.Mem.SetRegisterI32(0x8, tvm.Prog.Start())
+	tvm.Mem.SetRegisterI32(tinyvm.EIP, tvm.Prog.Start())
 
 	// here we go
 	reader := bufio.NewReader(os.Stdin)
@@ -62,23 +62,27 @@ LOOP:
 			bp := BreakPoint{address: addr}
 			breakpoints = append(breakpoints, bp)
 		case CMD_STEP:
-			tvm.Step(tvm.Mem.GetRegisterI32(0x8))
-			(*tvm.Mem.GetRegisterI32(0x8))++
-			fmt.Printf("Advancing instruction pointer to %d\n", *tvm.Mem.GetRegisterI32(0x8))
+			tvm.Step(tvm.Mem.GetRegisterI32(tinyvm.EIP))
+			(*tvm.Mem.GetRegisterI32(tinyvm.EIP))++
+			fmt.Printf("Advancing instruction pointer to %d\n", *tvm.Mem.GetRegisterI32(tinyvm.EIP))
 		case CMD_CONTINUE:
 			// one step jumps over break point.
-			tvm.Step(tvm.Mem.GetRegisterI32(0x8))
-			(*tvm.Mem.GetRegisterI32(0x8))++
+			tvm.Step(tvm.Mem.GetRegisterI32(tinyvm.EIP))
+			(*tvm.Mem.GetRegisterI32(tinyvm.EIP))++
 			hitBreakPoint = run(tvm, breakpoints)
+		case CMD_INFOS:
+			regInfos := tvm.Mem.AllRegisterInfos()
+			fmt.Printf("register infos: \n%s", regInfos)
+			fmt.Printf("FLAGS: %d Remainder: %d\n", tvm.Mem.GetFLAGS(), tvm.Mem.GetRemainder())
 		}
 
-		if *tvm.Mem.GetRegisterI32(0x8) > tvm.Prog.NumInstr()-1 {
+		if *tvm.Mem.GetRegisterI32(tinyvm.EIP) > tvm.Prog.NumInstr()-1 {
 			fmt.Printf("End of program readched.\n")
 			break LOOP
 		}
 
 		if hitBreakPoint {
-			fmt.Printf("BreakPoint hit at address: %d\n", *tvm.Mem.GetRegisterI32(0x8))
+			fmt.Printf("BreakPoint hit at address: %d\n", *tvm.Mem.GetRegisterI32(tinyvm.EIP))
 		}
 	}
 
@@ -86,7 +90,7 @@ LOOP:
 }
 
 func run(tvm *tinyvm.Ctx, bps []BreakPoint) bool {
-	var idxInstr *int = tvm.Mem.GetRegisterI32(0x8)
+	var idxInstr *int = tvm.Mem.GetRegisterI32(tinyvm.EIP)
 	for {
 		if *idxInstr > tvm.Prog.NumInstr()-1 {
 			return false

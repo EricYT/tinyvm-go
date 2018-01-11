@@ -8,15 +8,22 @@ const (
 	CMD_BREAK
 	CMD_STEP
 	CMD_CONTINUE
+	CMD_INFOS
 	CMD_NOP
 )
 
 var cmdMap map[string]cmd = map[string]cmd{
 	"q":        CMD_QUIT,
 	"run":      CMD_RUN,
+	"r":        CMD_RUN,
 	"break":    CMD_BREAK,
+	"b":        CMD_BREAK,
 	"step":     CMD_STEP,
+	"s":        CMD_STEP,
 	"continue": CMD_CONTINUE,
+	"c":        CMD_CONTINUE,
+	"infos":    CMD_INFOS,
+	"i":        CMD_INFOS,
 }
 
 func inputToCmd(input string) (cmd, bool) {

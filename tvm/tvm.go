@@ -58,7 +58,7 @@ func (ctx *Ctx) Interpret(filename string) error {
 }
 
 func (ctx *Ctx) Run() error {
-	instrIdx := &ctx.Mem.registers[0x8].i32
+	instrIdx := &ctx.Mem.registers[EIP].i32
 	*instrIdx = ctx.Prog.start
 
 	// program run step by step
