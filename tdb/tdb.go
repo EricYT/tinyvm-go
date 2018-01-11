@@ -66,6 +66,7 @@ LOOP:
 			(*tvm.Mem.GetRegisterI32(0x8))++
 			fmt.Printf("Advancing instruction pointer to %d\n", *tvm.Mem.GetRegisterI32(0x8))
 		case CMD_CONTINUE:
+			// one step jumps over break point.
 			tvm.Step(tvm.Mem.GetRegisterI32(0x8))
 			(*tvm.Mem.GetRegisterI32(0x8))++
 			hitBreakPoint = run(tvm, breakpoints)
