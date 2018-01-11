@@ -19,9 +19,9 @@ func (ctx *Ctx) ParseProgram(lexer *lexerCtx) error {
 		if opc == opcode(-1) {
 			continue
 		}
-		ctx.prog.instr = append(ctx.prog.instr, opc)
+		ctx.Prog.instr = append(ctx.Prog.instr, opc)
 		args := ctx.parseArgs(lineTokens, instrIdx)
-		ctx.prog.args = append(ctx.prog.args, args)
+		ctx.Prog.args = append(ctx.Prog.args, args)
 	}
 
 	return nil
@@ -29,7 +29,7 @@ func (ctx *Ctx) ParseProgram(lexer *lexerCtx) error {
 
 func (ctx *Ctx) ParseLabels(lexer *lexerCtx) error {
 	var numInstr int
-	prog := ctx.prog
+	prog := ctx.Prog
 	for _, tokens := range lexer.Tokens() {
 		// tokens of every signal line
 		validInstruction := false
@@ -89,7 +89,7 @@ func (ctx *Ctx) parseArgs(instrTokens [][]byte, index int) []*int {
 		}
 
 		/* Check to see if the token specifies a register */
-		if reg := tokenToRegister(token, ctx.mem); reg != nil {
+		if reg := tokenToRegister(token, ctx.Mem); reg != nil {
 			args = append(args, reg)
 			continue
 		}
@@ -98,19 +98,19 @@ func (ctx *Ctx) parseArgs(instrTokens [][]byte, index int) []*int {
 		if token[0] == '[' {
 			endIdx := bytes.IndexByte(token, ']')
 			if endIdx != -1 {
-				args = append(args, &ctx.mem.space[parseValue(token[1:endIdx])])
+				args = append(args, &ctx.Mem.space[ParseValue(token[1:endIdx])])
 				continue
 			}
 		}
 
 		/* Check if the argument is a label */
-		if addr, ok := ctx.prog.labels.Find(string(token)); ok {
-			args = append(args, addValue(*addr, ctx.prog))
+		if addr, ok := ctx.Prog.labels.Find(string(token)); ok {
+			args = append(args, addValue(*addr, ctx.Prog))
 			continue
 		}
 
 		/* Fuck it, parse it as a value */
-		args = append(args, addValue(parseValue(token), ctx.prog))
+		args = append(args, addValue(ParseValue(token), ctx.Prog))
 	}
 	return args
 }
@@ -127,7 +127,7 @@ func (ctx *Ctx) parseInstr(instrTokens [][]byte) (opcode, int) {
 		}
 		opc, ok := instrToOpCode(token)
 		if ok {
-			ctx.prog.numInstr++
+			ctx.Prog.numInstr++
 			return opc, index
 		}
 	}
@@ -136,7 +136,7 @@ func (ctx *Ctx) parseInstr(instrTokens [][]byte) (opcode, int) {
 }
 
 // utils
-func parseValue(token []byte) int {
+func ParseValue(token []byte) int {
 	delimiter := bytes.IndexByte(token, '|')
 	var base int = 0
 

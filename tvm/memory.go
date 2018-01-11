@@ -59,3 +59,19 @@ func (m *Mem) StackPop() *int {
 	m.registers[0x6].i32 += 1
 	return &dest
 }
+
+func (m *Mem) SetRegisterI32(idx int, v int) {
+	m.registers[idx].i32 = v
+}
+
+func (m *Mem) SetRegisterI32Ptr(idx int, v *int) {
+	m.registers[idx].i32Ptr = v
+}
+
+func (m *Mem) GetRegisterI32(idx int) *int {
+	return &m.registers[idx].i32
+}
+
+func (m *Mem) GetRegisterI32Ptr(idx int) *int {
+	return m.registers[idx].i32Ptr
+}

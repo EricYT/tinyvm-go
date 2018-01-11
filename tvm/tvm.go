@@ -12,16 +12,16 @@ import (
 /* core struct tvm */
 
 type Ctx struct {
-	prog *Prog
-	mem  *Mem
+	Prog *Prog
+	Mem  *Mem
 }
 
 func NewCtx() *Ctx {
 	ctx := new(Ctx)
 
-	ctx.prog = NewProg()
-	ctx.mem = NewMem(MIN_MEMORY_SIZE)
-	ctx.mem.StackCreate(MIN_MEMORY_SIZE)
+	ctx.Prog = NewProg()
+	ctx.Mem = NewMem(MIN_MEMORY_SIZE)
+	ctx.Mem.StackCreate(MIN_MEMORY_SIZE)
 
 	return ctx
 }
@@ -42,7 +42,7 @@ func (ctx *Ctx) Interpret(filename string) error {
 
 	// lexer analysis
 	lexer := NewLexerCtx()
-	lexer.Parse(source, ctx.prog.defines)
+	lexer.Parse(source, ctx.Prog.defines)
 
 	// parse labels
 	if err := ctx.ParseLabels(lexer); err != nil {
@@ -58,24 +58,24 @@ func (ctx *Ctx) Interpret(filename string) error {
 }
 
 func (ctx *Ctx) Run() error {
-	instrIdx := &ctx.mem.registers[0x8].i32
-	*instrIdx = ctx.prog.start
+	instrIdx := &ctx.Mem.registers[0x8].i32
+	*instrIdx = ctx.Prog.start
 
 	// program run step by step
 	for {
-		if *instrIdx > len(ctx.prog.instr)-1 {
+		if *instrIdx > len(ctx.Prog.instr)-1 {
 			break
 		}
-		ctx.step(instrIdx)
+		ctx.Step(instrIdx)
 		(*instrIdx)++
 	}
 
 	return nil
 }
 
-func (ctx *Ctx) step(instrIdx *int) error {
-	opcode := ctx.prog.instr[*instrIdx]
-	args := ctx.prog.args[*instrIdx]
+func (ctx *Ctx) Step(instrIdx *int) error {
+	opcode := ctx.Prog.instr[*instrIdx]
+	args := ctx.Prog.args[*instrIdx]
 
 	switch opcode {
 	case NOP: // nop
@@ -85,13 +85,13 @@ func (ctx *Ctx) step(instrIdx *int) error {
 
 	// stack operations
 	case PUSH: // push
-		ctx.mem.StackPush(args[0])
+		ctx.Mem.StackPush(args[0])
 	case POP: // pop
-		*args[0] = *ctx.mem.StackPop()
+		*args[0] = *ctx.Mem.StackPop()
 	case PUSHF: // pushf
-		ctx.mem.StackPush(&ctx.mem.FLAGS)
+		ctx.Mem.StackPush(&ctx.Mem.FLAGS)
 	case POPF: // popf
-		*args[0] = *ctx.mem.StackPop()
+		*args[0] = *ctx.Mem.StackPop()
 
 	// arithmetic operators
 	case INC: // inc
@@ -107,9 +107,9 @@ func (ctx *Ctx) step(instrIdx *int) error {
 	case DIV: // div
 		*args[0] /= *args[1]
 	case MOD: // mod
-		ctx.mem.remainder = *args[0] % *args[1]
+		ctx.Mem.remainder = *args[0] % *args[1]
 	case REM: // rem
-		*args[0] = ctx.mem.remainder
+		*args[0] = ctx.Mem.remainder
 
 	// arithmetic shift
 	case NOT: // not
@@ -134,37 +134,37 @@ func (ctx *Ctx) step(instrIdx *int) error {
 		if *args[0] > *args[1] {
 			r2 = 0x1
 		}
-		ctx.mem.FLAGS = r1 | (r2 << 1)
+		ctx.Mem.FLAGS = r1 | (r2 << 1)
 	case CALL: // call
-		ctx.mem.StackPush(instrIdx)
+		ctx.Mem.StackPush(instrIdx)
 		fallthrough
 	case JMP: // jmp
 		*instrIdx = *args[0] - 1
 	case RET: // ret
-		*instrIdx = *ctx.mem.StackPop()
+		*instrIdx = *ctx.Mem.StackPop()
 
 	case JE: // je
-		if (ctx.mem.FLAGS & 0x1) == 0x1 {
+		if (ctx.Mem.FLAGS & 0x1) == 0x1 {
 			*instrIdx = *args[0] - 1
 		}
 	case JNE: // jne
-		if (ctx.mem.FLAGS & 0x1) != 0x1 {
+		if (ctx.Mem.FLAGS & 0x1) != 0x1 {
 			*instrIdx = *args[0] - 1
 		}
 	case JG: // jg
-		if (ctx.mem.FLAGS & 0x2) == 0x2 {
+		if (ctx.Mem.FLAGS & 0x2) == 0x2 {
 			*instrIdx = *args[0] - 1
 		}
 	case JGE: // jge
-		if (ctx.mem.FLAGS & 0x3) != 0x0 {
+		if (ctx.Mem.FLAGS & 0x3) != 0x0 {
 			*instrIdx = *args[0] - 1
 		}
 	case JL: // jl
-		if (ctx.mem.FLAGS & 0x3) == 0x0 {
+		if (ctx.Mem.FLAGS & 0x3) == 0x0 {
 			*instrIdx = *args[0] - 1
 		}
 	case JLE: // jle
-		if (ctx.mem.FLAGS & 0x2) == 0x0 {
+		if (ctx.Mem.FLAGS & 0x2) == 0x0 {
 			*instrIdx = *args[0] - 1
 		}
 	case PRN: // prn

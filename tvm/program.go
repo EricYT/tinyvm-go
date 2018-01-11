@@ -24,3 +24,11 @@ func NewProg() *Prog {
 
 	return prog
 }
+
+func (prog *Prog) Start() int {
+	return prog.start
+}
+
+func (prog *Prog) NumInstr() int {
+	return prog.numInstr
+}

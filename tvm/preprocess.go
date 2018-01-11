@@ -28,11 +28,11 @@ func (c *Ctx) preprocess(source []byte) ([]byte, error) {
 			return nil, err
 		}
 		if def != nil {
-			if _, ok := c.prog.defines.FindRef(def.key); ok {
+			if _, ok := c.Prog.defines.FindRef(def.key); ok {
 				log.Printf("Multiple definitions for %s.\n", def.key)
 				return nil, ErrorPreprocessDefineMultipleDefine
 			}
-			c.prog.defines.AddRef(def.key, def.value)
+			c.Prog.defines.AddRef(def.key, def.value)
 		}
 		if !included && (def == nil) {
 			break
