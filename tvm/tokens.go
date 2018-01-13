@@ -6,10 +6,14 @@ const (
 )
 
 // tvm opcode map
-type opcode int
+type Opcode int
+
+func (o Opcode) String() string {
+	return opcodes[int(o)]
+}
 
 const (
-	NOP opcode = iota
+	NOP Opcode = iota
 	INT
 	MOV
 
@@ -49,7 +53,7 @@ const (
 	PRN
 )
 
-var opcodeMap map[string]opcode = map[string]opcode{
+var opcodeMap map[string]Opcode = map[string]Opcode{
 	"nop": NOP,
 	"int": INT,
 	"mov": MOV,
@@ -90,6 +94,47 @@ var opcodeMap map[string]opcode = map[string]opcode{
 	"prn": PRN,
 }
 
+var opcodes []string = []string{
+	"nop",
+	"int",
+	"mov",
+
+	"push",
+	"pop",
+	"pushf",
+	"popf",
+
+	"inc",
+	"dec",
+	"add",
+	"sub",
+	"mul",
+	"div",
+	"mod",
+	"rem",
+
+	"not",
+	"xor",
+	"or",
+	"and",
+	"shl",
+	"shr",
+
+	"cmp",
+	"jmp",
+	"call",
+	"ret",
+
+	"je",
+	"jne",
+	"jg",
+	"jge",
+	"jl",
+	"jle",
+
+	"prn",
+}
+
 /*
 static const char *tvm_opcode_map[] = {
 	"nop", "int", "mov",
@@ -102,10 +147,14 @@ static const char *tvm_opcode_map[] = {
 };
 */
 
-type register int
+type Register int
+
+func (r Register) String() string {
+	return registers[int(r)]
+}
 
 const (
-	EAX register = iota
+	EAX Register = iota
 	EBX
 	ECX
 	EDX
@@ -128,7 +177,7 @@ const (
 	R15
 )
 
-var registerMap map[string]register = map[string]register{
+var registerMap map[string]Register = map[string]Register{
 	"eax": EAX,
 	"ebx": EBX,
 	"ecx": ECX,

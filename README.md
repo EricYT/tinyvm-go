@@ -69,6 +69,11 @@ WARNING: "bs" is not a valid command.
 tdb >: break 1
 tdb >: run
 BreakPoint hit at address: 1
+tdb >: instr
+Instruction index 1: mov ebp esp
+tdb >: args
+current program eip: 1 opcode: 2 instruction: mov
+args: 67108864  67108862
 tdb >: infos
 register infos:
 register eax value: i32: 42 i32Ptr is nil

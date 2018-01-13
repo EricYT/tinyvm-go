@@ -71,12 +71,14 @@ LOOP:
 			(*tvm.Mem.GetRegisterI32(tinyvm.EIP))++
 			hitBreakPoint = run(tvm, breakpoints)
 		case CMD_INFOS:
-			regInfos := tvm.Mem.AllRegisterInfos()
-			fmt.Printf("register infos: \n%s", regInfos)
-			fmt.Printf("FLAGS: %d Remainder: %d\n", tvm.Mem.GetFLAGS(), tvm.Mem.GetRemainder())
+			displayInfos(tvm)
+		case CMD_ARGS:
+			displayArgs(tvm)
+		case CMD_INSTR:
+			displayInstruction(tvm)
 		}
 
-		if *tvm.Mem.GetRegisterI32(tinyvm.EIP) > tvm.Prog.NumInstr()-1 {
+		if tvm.End() {
 			fmt.Printf("End of program readched.\n")
 			break LOOP
 		}
@@ -89,10 +91,41 @@ LOOP:
 	return nil
 }
 
+func displayInfos(tvm *tinyvm.Ctx) {
+	regInfos := tvm.Mem.AllRegisterInfos()
+	fmt.Printf("register infos: \n%s", regInfos)
+	fmt.Printf("FLAGS: %d Remainder: %d\n", tvm.Mem.GetFLAGS(), tvm.Mem.GetRemainder())
+}
+
+func displayArgs(tvm *tinyvm.Ctx) {
+	eip := *tvm.Mem.GetRegisterI32(tinyvm.EIP)
+	args := tvm.Prog.Args(eip)
+	if args != nil {
+		opcode := tvm.Prog.OpCode(eip)
+		fmt.Printf("current program eip: %d opcode: %d instruction: %s\nargs: ", eip, opcode, opcode)
+		for _, arg := range args {
+			fmt.Printf("%d\t", *arg)
+		}
+	}
+	fmt.Printf("\n")
+}
+
+func displayInstruction(tvm *tinyvm.Ctx) {
+	eip := *tvm.Mem.GetRegisterI32(tinyvm.EIP)
+	tokens := tvm.Prog.Tokens(eip)
+	if tokens != nil {
+		fmt.Printf("Instruction index %d: ", eip)
+		for _, token := range tokens {
+			fmt.Printf("%s ", string(token))
+		}
+		fmt.Printf("\n")
+	}
+}
+
 func run(tvm *tinyvm.Ctx, bps []BreakPoint) bool {
 	var idxInstr *int = tvm.Mem.GetRegisterI32(tinyvm.EIP)
 	for {
-		if *idxInstr > tvm.Prog.NumInstr()-1 {
+		if tvm.End() {
 			return false
 		}
 		// check break points

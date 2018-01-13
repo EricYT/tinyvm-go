@@ -69,19 +69,19 @@ func (m *Mem) StackPop() *int {
 	return &dest
 }
 
-func (m *Mem) SetRegisterI32(reg register, v int) {
+func (m *Mem) SetRegisterI32(reg Register, v int) {
 	m.registers[reg].i32 = v
 }
 
-func (m *Mem) SetRegisterI32Ptr(reg register, v *int) {
+func (m *Mem) SetRegisterI32Ptr(reg Register, v *int) {
 	m.registers[reg].i32Ptr = v
 }
 
-func (m *Mem) GetRegisterI32(reg register) *int {
+func (m *Mem) GetRegisterI32(reg Register) *int {
 	return &m.registers[reg].i32
 }
 
-func (m *Mem) GetRegisterI32Ptr(reg register) *int {
+func (m *Mem) GetRegisterI32Ptr(reg Register) *int {
 	return m.registers[reg].i32Ptr
 }
 

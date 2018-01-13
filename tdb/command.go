@@ -9,6 +9,8 @@ const (
 	CMD_STEP
 	CMD_CONTINUE
 	CMD_INFOS
+	CMD_ARGS
+	CMD_INSTR
 	CMD_NOP
 )
 
@@ -24,6 +26,9 @@ var cmdMap map[string]cmd = map[string]cmd{
 	"c":        CMD_CONTINUE,
 	"infos":    CMD_INFOS,
 	"i":        CMD_INFOS,
+	"args":     CMD_ARGS,
+	"a":        CMD_ARGS,
+	"instr":    CMD_INSTR,
 }
 
 func inputToCmd(input string) (cmd, bool) {

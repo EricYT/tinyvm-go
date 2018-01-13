@@ -63,7 +63,7 @@ func (ctx *Ctx) Run() error {
 
 	// program run step by step
 	for {
-		if *instrIdx > len(ctx.Prog.instr)-1 {
+		if ctx.End() {
 			break
 		}
 		ctx.Step(instrIdx)
@@ -71,6 +71,10 @@ func (ctx *Ctx) Run() error {
 	}
 
 	return nil
+}
+
+func (ctx *Ctx) End() bool {
+	return ctx.Mem.registers[EIP].i32 > len(ctx.Prog.instr)-1
 }
 
 func (ctx *Ctx) Step(instrIdx *int) error {

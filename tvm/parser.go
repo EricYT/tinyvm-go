@@ -16,10 +16,11 @@ func (ctx *Ctx) ParseProgram(lexer *lexerCtx) error {
 
 	for _, lineTokens := range lexer.Tokens() {
 		opc, instrIdx := ctx.parseInstr(lineTokens)
-		if opc == opcode(-1) {
+		if opc == Opcode(-1) {
 			continue
 		}
 		ctx.Prog.instr = append(ctx.Prog.instr, opc)
+		ctx.Prog.tokens = append(ctx.Prog.tokens, lineTokens)
 		args := ctx.parseArgs(lineTokens, instrIdx)
 		ctx.Prog.args = append(ctx.Prog.args, args)
 	}
@@ -119,7 +120,7 @@ func (ctx *Ctx) parseArgs(instrTokens [][]byte, index int) []*int {
  This is a helper function that converts one instruction,
  from one line of code, to tvm bytecode.
 */
-func (ctx *Ctx) parseInstr(instrTokens [][]byte) (opcode, int) {
+func (ctx *Ctx) parseInstr(instrTokens [][]byte) (Opcode, int) {
 	for index, token := range instrTokens {
 		// skip empty one
 		if len(token) == 0 {
@@ -132,7 +133,7 @@ func (ctx *Ctx) parseInstr(instrTokens [][]byte) (opcode, int) {
 		}
 	}
 
-	return opcode(-1), -1
+	return Opcode(-1), -1
 }
 
 // utils
@@ -162,11 +163,11 @@ func ParseValue(token []byte) int {
 	return int(val)
 }
 
-func instrToOpCode(instr []byte) (opcode, bool) {
+func instrToOpCode(instr []byte) (Opcode, bool) {
 	if opc, ok := opcodeMap[string(instr)]; ok {
 		return opc, true
 	}
-	return opcode(-1), false
+	return Opcode(-1), false
 }
 
 func tokenToRegister(token []byte, mem *Mem) *int {
